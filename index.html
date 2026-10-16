@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scaffale Filamenti</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Filamenti">
+<meta name="theme-color" content="#ECEEF1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+html,body{margin:0}
+
+/* Layout: officina — riepilogo in alto, filtri per materiale, griglia di bobine con anello di riempimento */
+:root{
+  --bg:#ECEEF1; --surface:#F8F9FA; --line:#D3D7DD; --fg:#1A1E24; --muted:#5E6672;
+  --accent:#D9531E; --accent-ink:#FFFFFF; --ok:#2F8A57; --warn:#C7861A; --bad:#C23B32; --track:#DDE1E6;
+  --f-display:"Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --shadow:0 1px 2px rgba(20,24,30,.06), 0 4px 14px rgba(20,24,30,.06);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171B; --surface:#1C2026; --line:#2E343C; --fg:#E7EAEE; --muted:#97A0AC;
+  --accent:#F06A33; --accent-ink:#1A0E08; --ok:#4CB878; --warn:#E3A33A; --bad:#E5605A; --track:#2A3038;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#14171B; --surface:#1C2026; --line:#2E343C; --fg:#E7EAEE; --muted:#97A0AC;
+  --accent:#F06A33; --accent-ink:#1A0E08; --ok:#4CB878; --warn:#E3A33A; --bad:#E5605A; --track:#2A3038;
+  --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(26px,5vw,36px);letter-spacing:.01em;margin:0;text-wrap:balance}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.sub{color:var(--muted);margin:4px 0 0}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:8px;padding:8px 14px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.danger{color:var(--bad)}
+.btn:focus-visible,.chip:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.stat{background:var(--surface);padding:12px 14px;min-width:0}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .v.alert{color:var(--bad)}
+@media (max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:5px 12px;font-size:13px;font-family:var(--f-mono)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.bar .sp{flex:1}
+select.sort{font:inherit;font-size:13px;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);min-width:0}
+.card.low{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
+.head{display:flex;gap:14px;align-items:center}
+.ring{flex:none;width:84px;height:84px}
+.ring text{font-family:var(--f-mono);font-size:15px;font-weight:500;fill:var(--fg)}
+.title{min-width:0;display:flex;flex-direction:column;gap:4px}
+.title h3{margin:0;font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.15;overflow-wrap:anywhere}
+.brand{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-family:var(--f-mono);font-size:11px;padding:2px 7px;border-radius:5px;background:var(--track);color:var(--fg)}
+.tag.mat{background:var(--fg);color:var(--bg)}
+.tag.low{background:var(--bad);color:#fff}
+.tag.mid{background:var(--warn);color:#1a1200}
+.tag.ex{background:transparent;border:1px dashed var(--muted);color:var(--muted)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px}
+dt{color:var(--muted)}
+dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;overflow-wrap:anywhere}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.acts .btn{padding:6px 10px;font-size:13px;flex:1}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:40px 20px;text-align:center;color:var(--muted)}
+.empty strong{display:block;color:var(--fg);font-family:var(--f-display);font-size:20px;margin-bottom:6px}
+.note{font-size:12px;color:var(--muted)}
+/* pannello */
+.scrim{position:fixed;inset:0;background:rgba(10,12,16,.5);display:flex;align-items:flex-end;justify-content:center;z-index:50;
+  padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+@media (min-width:640px){.scrim{align-items:center}}
+.panel{background:var(--surface);color:var(--fg);border-radius:14px;width:100%;max-width:520px;max-height:100%;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
+.panel h2{margin:0;font-family:var(--f-display);font-size:20px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+input,select,textarea{font:inherit;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+input[type=color]{padding:2px;height:40px}
+.row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.big{font-family:var(--f-mono);font-size:28px;text-align:center}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.err{color:var(--bad);font-size:13px;margin:0}
+.log{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;z-index:60}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .2s}}
+
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+.foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.foot .btn{font-size:13px;padding:6px 12px}
+
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Scaffale Filamenti</h1>
+      <p class="sub">Grammi rimasti per ogni bobina, con avviso quando scendono sotto soglia.</p>
+    </div>
+    <button class="btn primary" id="addBtn" type="button">+ Aggiungi bobina</button>
+  </header>
+
+  <section class="stats" aria-label="Riepilogo">
+    <div class="stat"><div class="k">Bobine</div><div class="v" id="sCount">–</div></div>
+    <div class="stat"><div class="k">Filamento totale</div><div class="v" id="sKg">–</div></div>
+    <div class="stat"><div class="k">Sotto soglia</div><div class="v" id="sLow">–</div></div>
+    <div class="stat"><div class="k">Usati (30 gg)</div><div class="v" id="sUsed">–</div></div>
+  </section>
+
+  <div class="bar" id="filters" role="group" aria-label="Filtra per materiale"></div>
+
+  <main id="grid" class="grid" aria-live="polite"></main>
+  <div id="emptyBox" class="empty">
+    <strong>Nessuna bobina sullo scaffale</strong>
+    Premi “Aggiungi bobina” e inserisci colore, materiale e peso netto. Il resto si calcola da solo.
+  </div>
+  <p class="note" id="status"></p>
+  <div class="foot"><button class="btn" type="button" id="expBtn">Esporta backup</button><label class="btn" for="impFile" style="flex-direction:row;color:var(--fg);font-size:13px">Importa backup<input type="file" id="impFile" accept="application/json,.json" hidden></label><span class="note">I dati restano solo su questo iPhone: esporta un backup ogni tanto.</span></div>
+</div>
+
+<div id="scrim" class="scrim" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const MATS=["PLA","PLA+","PETG","ABS","ASA","TPU","Nylon","PC","Altro"];
+const DEF_T={PLA:[205,60],"PLA+":[215,60],PETG:[235,80],ABS:[245,100],ASA:[250,100],TPU:[225,50],Nylon:[255,80],PC:[270,110],Altro:[210,60]};
+let spools=[], col=null, canWrite=true, filter="Tutti", sortBy="low";
+try{ sortBy=localStorage.getItem("fil-sort")||"low"; filter=localStorage.getItem("fil-filter")||"Tutti"; }catch(e){}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtG=g=>Math.round(g).toLocaleString("it-IT")+" g";
+const pct=s=>Math.max(0,Math.min(1,(s.remaining||0)/(s.net||1000)));
+const isLow=s=>(s.remaining||0)<=(s.threshold??150);
+const isMid=s=>!isLow(s)&&pct(s)<0.35;
+// metri approssimativi: densità per materiale (g/cm³)
+const DENS={PLA:1.24,"PLA+":1.24,PETG:1.27,ABS:1.04,ASA:1.07,TPU:1.21,Nylon:1.14,PC:1.2,Altro:1.24};
+const meters=s=>{const r=(s.diameter||1.75)/20; const cm3=(s.remaining||0)/(DENS[s.material]||1.24); return cm3/(Math.PI*r*r)/100;};
+
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2200);}
+
+function ring(s){
+  const p=pct(s), R=34, C=2*Math.PI*R;
+  const stroke=isLow(s)?"var(--bad)":isMid(s)?"var(--warn)":"var(--ok)";
+  return `<svg class="ring" viewBox="0 0 84 84" aria-hidden="true">
+    <circle cx="42" cy="42" r="${R}" fill="none" stroke="var(--track)" stroke-width="8"/>
+    <circle cx="42" cy="42" r="${R}" fill="none" stroke="${stroke}" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${(C*p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 42 42)"/>
+    <circle cx="42" cy="42" r="22" fill="${esc(s.color||'#888')}" stroke="var(--line)" stroke-width="1"/>
+    <circle cx="42" cy="42" r="7" fill="var(--surface)" stroke="var(--line)" stroke-width="1"/>
+  </svg>`;
+}
+
+function render(){
+  const mats=["Tutti",...MATS.filter(m=>spools.some(s=>s.material===m))];
+  if(!mats.includes(filter)) filter="Tutti";
+  $("#filters").innerHTML=mats.map(m=>`<button class="chip" type="button" data-f="${esc(m)}" aria-pressed="${m===filter}">${esc(m)}</button>`).join("")+
+    `<span class="sp"></span><label style="flex-direction:row;align-items:center;gap:6px">Ordina
+      <select class="sort" id="sortSel"><option value="low">meno rimasto</option><option value="name">colore</option><option value="mat">materiale</option><option value="recent">ultimo uso</option></select></label>`;
+  $("#sortSel").value=sortBy;
+
+  let list=spools.filter(s=>filter==="Tutti"||s.material===filter);
+  const by={low:(a,b)=>pct(a)-pct(b),name:(a,b)=>(a.name||"").localeCompare(b.name||""),mat:(a,b)=>(a.material||"").localeCompare(b.material||"")||pct(a)-pct(b),recent:(a,b)=>(b.lastUsed||"").localeCompare(a.lastUsed||"")};
+  list.sort(by[sortBy]||by.low);
+
+  $("#grid").innerHTML=list.map(s=>{
+    const t=s.temps||DEF_T[s.material]||DEF_T.Altro;
+    return `<article class="card ${isLow(s)?"low":""}">
+      <div class="head">${ring(s)}
+        <div class="title">
+          <h3>${esc(s.name||"Senza nome")}</h3>
+          <div class="brand">${esc(s.brand||"—")}</div>
+          <div class="tags"><span class="tag mat">${esc(s.material)}</span><span class="tag">⌀ ${esc(s.diameter||1.75)}</span>
+            ${isLow(s)?'<span class="tag low">da ricomprare</span>':isMid(s)?'<span class="tag mid">in calo</span>':""}
+            ${s.example?'<span class="tag ex">esempio</span>':""}</div>
+        </div>
+      </div>
+      <dl>
+        <dt>Rimasti</dt><dd><b>${fmtG(s.remaining||0)}</b> / ${fmtG(s.net||1000)} · ${Math.round(pct(s)*100)}%</dd>
+        <dt>Lunghezza</dt><dd>≈ ${Math.round(meters(s))} m</dd>
+        <dt>Ugello / piatto</dt><dd>${t[0]} °C / ${t[1]} °C</dd>
+        ${s.location?`<dt>Posizione</dt><dd>${esc(s.location)}</dd>`:""}
+        ${s.opened?`<dt>Aperta il</dt><dd>${new Date(s.opened).toLocaleDateString("it-IT")}</dd>`:""}
+      </dl>
+      ${canWrite?`<div class="acts">
+        <button class="btn" type="button" data-a="use" data-id="${s.id}">Scala stampa</button>
+        <button class="btn" type="button" data-a="weigh" data-id="${s.id}">Pesa</button>
+        <button class="btn" type="button" data-a="edit" data-id="${s.id}">Modifica</button>
+      </div>`:""}
+    </article>`;}).join("");
+
+  $("#emptyBox").hidden=spools.length>0;
+  const tot=spools.reduce((a,s)=>a+(s.remaining||0),0);
+  const since=Date.now()-30*864e5;
+  const used=spools.reduce((a,s)=>a+(s.log||[]).filter(l=>l.type==="use"&&Date.parse(l.at)>since).reduce((x,l)=>x+(l.g||0),0),0);
+  const low=spools.filter(isLow).length;
+  $("#sCount").textContent=spools.length;
+  $("#sKg").textContent=(tot/1000).toLocaleString("it-IT",{maximumFractionDigits:2})+" kg";
+  $("#sLow").textContent=low; $("#sLow").classList.toggle("alert",low>0);
+  $("#sUsed").textContent=fmtG(used);
+}
+
+document.addEventListener("click",e=>{
+  const f=e.target.closest("[data-f]"); if(f){filter=f.dataset.f;try{localStorage.setItem("fil-filter",filter)}catch(_){ } render(); return;}
+  const a=e.target.closest("[data-a]"); if(!a) return;
+  const s=spools.find(x=>x.id===a.dataset.id); if(!s) return;
+  ({use:openUse,weigh:openWeigh,edit:openEdit})[a.dataset.a](s);
+});
+document.addEventListener("change",e=>{ if(e.target.id==="sortSel"){sortBy=e.target.value;try{localStorage.setItem("fil-sort",sortBy)}catch(_){ } render();}});
+$("#addBtn").onclick=()=>openEdit(null);
+
+/* pannelli */
+const scrim=$("#scrim");
+function openPanel(html,onSubmit){
+  scrim.innerHTML=`<form class="panel" id="pform" novalidate>${html}</form>`; scrim.hidden=false;
+  const form=$("#pform"); const first=form.querySelector("input,select"); first&&first.focus();
+  form.addEventListener("submit",async ev=>{ev.preventDefault(); const err=form.querySelector(".err"); err&&(err.textContent="");
+    try{ const msg=await onSubmit(new FormData(form),form); if(msg!==false){closePanel(); msg&&toast(msg);} }
+    catch(x){ if(err) err.textContent=x.message||"Salvataggio non riuscito. Riprova."; }});
+  form.querySelector("[data-close]").onclick=closePanel;
+}
+function closePanel(){scrim.hidden=true;scrim.innerHTML="";}
+scrim.addEventListener("click",e=>{if(e.target===scrim)closePanel();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)closePanel();});
+
+const num=(v,d)=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:d;};
+const pushLog=(s,entry)=>[entry,...(s.log||[])].slice(0,30);
+
+function openUse(s){
+  openPanel(`<h2>Scala stampa · ${esc(s.name)}</h2>
+    <p class="hint">Inserisci i grammi indicati dallo slicer per la stampa appena fatta. Rimasti ora: ${fmtG(s.remaining)}.</p>
+    <label>Grammi usati<input class="big" id="f-g" name="g" inputmode="decimal" placeholder="0" required></label>
+    <label>Nota (facoltativa)<input id="f-n" name="note" placeholder="es. supporto braccio robot"></label>
+    ${(s.log||[]).length?`<ul class="log">${s.log.slice(0,5).map(l=>`<li>${new Date(l.at).toLocaleDateString("it-IT")} · ${l.type==="use"?"−"+fmtG(l.g):l.type==="weigh"?"pesata → "+fmtG(l.g):"modifica"}${l.note?" · "+esc(l.note):""}</li>`).join("")}</ul>`:""}
+    <p class="err"></p>
+    <div class="row"><button class="btn" type="button" data-close>Annulla</button><button class="btn primary">Scala</button></div>`,
+  async fd=>{
+    const g=num(fd.get("g"),NaN); if(!(g>0)) throw new Error("Scrivi un numero di grammi maggiore di zero.");
+    const now=new Date().toISOString(); const rem=Math.max(0,(s.remaining||0)-g);
+    await col.doc(s.id).update({remaining:rem,lastUsed:now,log:pushLog(s,{type:"use",g,at:now,note:fd.get("note")||""})});
+    return `Scalati ${fmtG(g)} da ${s.name}`+(rem<=(s.threshold??150)?" · sotto soglia":"");
+  });
+}
+
+function openWeigh(s){
+  openPanel(`<h2>Pesa · ${esc(s.name)}</h2>
+    <p class="hint">Metti la bobina sulla bilancia. Tolgo la tara della bobina vuota (${fmtG(s.tare??250)}).</p>
+    <label>Peso lordo sulla bilancia (g)<input class="big" id="f-w" name="w" inputmode="decimal" placeholder="0" required></label>
+    <p class="err"></p>
+    <div class="row"><button class="btn" type="button" data-close>Annulla</button><button class="btn primary">Aggiorna</button></div>`,
+  async fd=>{
+    const w=num(fd.get("w"),NaN); if(!(w>=0)) throw new Error("Scrivi il peso letto sulla bilancia, in grammi.");
+    const rem=Math.max(0,w-(s.tare??250)); const now=new Date().toISOString();
+    await col.doc(s.id).update({remaining:rem,log:pushLog(s,{type:"weigh",g:rem,at:now})});
+    return `${s.name}: ${fmtG(rem)} di filamento`;
+  });
+}
+
+function openEdit(s){
+  const n=!s; s=s||{material:"PLA",diameter:1.75,net:1000,tare:250,threshold:150,color:"#3a7bd5"};
+  const t=s.temps||DEF_T[s.material]||DEF_T.PLA;
+  openPanel(`<h2>${n?"Nuova bobina":"Modifica bobina"}</h2>
+    <div class="fields">
+      <label class="full">Colore / nome<input id="e-name" name="name" value="${esc(s.name||"")}" placeholder="es. Grigio grafite" required></label>
+      <label>Tinta<input id="e-color" type="color" name="color" value="${esc(s.color||"#888888")}"></label>
+      <label>Materiale<select id="e-mat" name="material">${MATS.map(m=>`<option ${m===s.material?"selected":""}>${m}</option>`).join("")}</select></label>
+      <label>Marca<input id="e-brand" name="brand" value="${esc(s.brand||"")}" placeholder="es. eSun"></label>
+      <label>Diametro (mm)<select id="e-dia" name="diameter"><option ${s.diameter!=2.85?"selected":""}>1.75</option><option ${s.diameter==2.85?"selected":""}>2.85</option></select></label>
+      <label>Peso netto (g)<input id="e-net" name="net" inputmode="decimal" value="${s.net??1000}"></label>
+      <label>Rimasti (g)<input id="e-rem" name="remaining" inputmode="decimal" value="${n?"":(s.remaining??"")}" placeholder="= netto"></label>
+      <label>Tara bobina vuota (g)<input id="e-tare" name="tare" inputmode="decimal" value="${s.tare??250}"></label>
+      <label>Avviso sotto (g)<input id="e-thr" name="threshold" inputmode="decimal" value="${s.threshold??150}"></label>
+      <label>Ugello (°C)<input id="e-tn" name="tn" inputmode="numeric" value="${t[0]}"></label>
+      <label>Piatto (°C)<input id="e-tb" name="tb" inputmode="numeric" value="${t[1]}"></label>
+      <label>Posizione<input id="e-loc" name="location" value="${esc(s.location||"")}" placeholder="es. Box secco 2"></label>
+      <label>Aperta il<input id="e-open" type="date" name="opened" value="${esc(s.opened||"")}"></label>
+    </div>
+    <p class="err"></p>
+    <div class="row">
+      ${n?"":`<button class="btn danger" type="button" id="delBtn">Elimina</button><span style="flex:1"></span>`}
+      <button class="btn" type="button" data-close>Annulla</button><button class="btn primary">${n?"Aggiungi":"Salva"}</button></div>`,
+  async fd=>{
+    const name=(fd.get("name")||"").trim(); if(!name) throw new Error("Dai un nome alla bobina, ad esempio il colore.");
+    const net=num(fd.get("net"),1000);
+    const body={name,color:fd.get("color"),material:fd.get("material"),brand:(fd.get("brand")||"").trim(),
+      diameter:num(fd.get("diameter"),1.75),net,remaining:Math.min(net,num(fd.get("remaining"),n?net:s.remaining??net)),
+      tare:num(fd.get("tare"),250),threshold:num(fd.get("threshold"),150),
+      temps:[num(fd.get("tn"),t[0]),num(fd.get("tb"),t[1])],location:(fd.get("location")||"").trim(),opened:fd.get("opened")||"",example:false};
+    if(n){ await col.add({...body,created:new Date().toISOString(),log:[]}); return `${name} aggiunta`; }
+    await col.doc(s.id).update(body); return "Modifiche salvate";
+  });
+  // aggiorna temperature suggerite al cambio materiale (solo nuove bobine)
+  if(n) $("#e-mat").onchange=e=>{const d=DEF_T[e.target.value];$("#e-tn").value=d[0];$("#e-tb").value=d[1];};
+  const del=$("#delBtn");
+  if(del) del.onclick=async()=>{
+    if(del.dataset.armed!=="1"){del.dataset.armed="1";del.textContent="Conferma eliminazione";return;}
+    try{await col.doc(s.id).delete();closePanel();toast(`${s.name} eliminata`);}catch(x){$(".err").textContent="Eliminazione non riuscita. Riprova.";}
+  };
+}
+
+const EXAMPLES=[
+ {id:"esempio-1",name:"Grigio grafite",color:"#4a4f57",material:"PLA",brand:"Marca esempio",diameter:1.75,net:1000,remaining:640,tare:250,threshold:150,temps:[205,60],location:"Box secco 1",opened:"2026-09-20",example:true,lastUsed:"2026-10-14T18:00:00Z",log:[{type:"use",g:42,at:"2026-10-14T18:00:00Z",note:"scocca modellino"}]},
+ {id:"esempio-2",name:"Bianco opaco",color:"#f2f0ea",material:"PLA",brand:"Marca esempio",diameter:1.75,net:1000,remaining:110,tare:250,threshold:150,temps:[210,60],location:"Scaffale A",opened:"2026-07-02",example:true,log:[]},
+ {id:"esempio-3",name:"Arancio traslucido",color:"#e8742a",material:"PETG",brand:"Marca esempio",diameter:1.75,net:1000,remaining:290,tare:220,threshold:150,temps:[235,80],location:"Box secco 2",opened:"2026-08-11",example:true,log:[]}];
+/* archivio locale */
+const KEY="scaffale-filamenti-v1";
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(spools));}catch(e){toast("Spazio pieno: dati non salvati");}}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+col={
+  add:async b=>{spools.push({id:uid(),...b});persist();render();},
+  doc:id=>({
+    update:async b=>{const i=spools.findIndex(s=>s.id===id);if(i<0)throw new Error("Bobina non trovata.");spools[i]={...spools[i],...b};persist();render();},
+    delete:async()=>{spools=spools.filter(s=>s.id!==id);persist();render();}
+  })
+};
+try{const raw=localStorage.getItem(KEY); if(raw) spools=JSON.parse(raw); else {spools=EXAMPLES;persist();}}catch(e){spools=EXAMPLES;}
+function refreshStatus(){$("#status").textContent=spools.some(s=>s.example)?"Le bobine segnate “esempio” sono dimostrative: modificale o eliminale.":"";}
+const _render=render; render=function(){_render();refreshStatus();};
+render();
+$("#expBtn").onclick=async()=>{
+  const name="filamenti-"+new Date().toISOString().slice(0,10)+".json";
+  const blob=new Blob([JSON.stringify({app:"scaffale-filamenti",v:1,spools},null,2)],{type:"application/json"});
+  const file=new File([blob],name,{type:"application/json"});
+  try{ if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Backup filamenti"});return;} }catch(e){if(e.name==="AbortError")return;}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+};
+$("#impFile").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{const d=JSON.parse(await f.text()); const list=Array.isArray(d)?d:d.spools; if(!Array.isArray(list)) throw 0;
+    spools=list.map(s=>({...s,id:s.id||uid()})); persist(); render(); toast(`Importate ${spools.length} bobine`);}
+  catch(_){toast("File non valido: scegli un backup esportato da questa app");}
+  e.target.value="";
+};
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+</script>
+
+</body>
+</html>
