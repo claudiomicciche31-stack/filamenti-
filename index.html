@@ -241,35 +241,43 @@ $("#addBtn").onclick=()=>openEdit(null);
 /* scansione etichetta */
 const BRANDS=["Bambu Lab","Anycubic","eSun","Sunlu","Elegoo","Polymaker","Prusament","Bambu","Creality","Geeetech","Eryone","Jayo","Kingroon","Overture","Hatchbox","Amolen","Tecbears","Fiberlogy","Fillamentum","Spectrum","Extrudr","Formfutura","colorFabb","3DJake","Azurefilm","Rosa3D","Kexcelled","iSANMATE","R3D","Giantarm","Ziro","Tinmorry","Duramic","Flashforge","Voxelab","Ultimaker","Qidi","Artillery","Snapmaker","Inland","Protopasta","Filoalfa","Recreus","Smartfil","Winkle","Kingroon","Deeplee","Iemai","Raise3D"];
 const COLORS=[
- [/\b(black|nero|negro|noir)\b/i,"Nero","#1d1d1f"],[/\b(white|bianco|blanc)\b/i,"Bianco","#f2f2ef"],
- [/\b(grey|gray|grigio|gris)\b/i,"Grigio","#8a8f96"],[/\b(silver|argento)\b/i,"Argento","#c0c4c8"],
- [/\b(gold|oro)\b/i,"Oro","#c9a43a"],[/\b(red|rosso|rouge)\b/i,"Rosso","#c62828"],
- [/\b(orange|arancio|arancione)\b/i,"Arancione","#ef6c00"],[/\b(yellow|giallo)\b/i,"Giallo","#f4c430"],
- [/\b(green|verde)\b/i,"Verde","#2e7d32"],[/\b(blue|blu|azzurro|bleu|navy)\b/i,"Blu","#1e5bb8"],
- [/\b(purple|violet|viola)\b/i,"Viola","#6a3fa0"],[/\b(pink|rosa)\b/i,"Rosa","#e57ba7"],
- [/\b(brown|marrone|wood|legno)\b/i,"Marrone","#7b5236"],[/\b(beige|skin|cream|crema|ivory)\b/i,"Beige","#e3cfa8"],
- [/\b(cyan|ciano|turquoise|turchese|teal)\b/i,"Turchese","#1fa3a8"],
- [/\b(transparent|clear|trasparente|translucent|natural|naturale)\b/i,"Trasparente","#dfe7ea"]];
-const MODS=[[/\bsilk\b/i,"silk"],[/\bmatte?\b|\bopaco\b/i,"opaco"],[/\bglitter|sparkle\b/i,"glitter"],[/\bmarble|marmo\b/i,"marmo"],[/\bglow\b/i,"fosforescente"],[/\brainbow|multicolou?r\b/i,"multicolore"]];
+ [/rose\s*gold|oro\s*rosa/i,"Oro rosa","#c98d7e"],[/\bcopp?er\b|\bcooper\b|\brame\b/i,"Rame","#b8733d"],
+ [/\bbronze?\b|\bbronzo\b/i,"Bronzo","#9c6b30"],[/\bchampagne\b/i,"Champagne","#d8c39a"],
+ [/\bgold(en)?\b|\boro\b/i,"Oro","#c9a43a"],[/\bsilver\b|\bargento\b|\btitanium\b/i,"Argento","#c0c4c8"],
+ [/(light|sky|baby)\s*blue|\bazzurro\b|\bceleste\b/i,"Azzurro","#6fb3e0"],[/(dark|navy|royal)\s*blue|\bnavy\b|blu\s*scuro/i,"Blu scuro","#1f3166"],
+ [/\bblue\b|\bblu\b|\bbleu\b/i,"Blu","#1e5bb8"],
+ [/light\s*gr[ae]y|grigio\s*chiaro/i,"Grigio chiaro","#b9bec4"],[/(dark|space)\s*gr[ae]y|\bcharcoal\b|\bantracite\b|grigio\s*scuro/i,"Grigio scuro","#4a4f57"],
+ [/\bgr[ae]y\b|\bgrigio\b/i,"Grigio","#8a8f96"],[/\bblack\b|\bnero\b/i,"Nero","#1d1d1f"],
+ [/\bivory\b|\bavorio\b/i,"Avorio","#efe8d6"],[/\bwhite\b|\bbianco\b/i,"Bianco","#f2f2ef"],
+ [/\bolive\b|army\s*green|\bmilitary\b|verde\s*oliva/i,"Verde oliva","#5d6b35"],[/\bmint\b|\bmenta\b/i,"Verde menta","#8fd9b6"],
+ [/\blime\b|fluo\w*\s*green/i,"Verde lime","#9ccc29"],[/(dark|forest)\s*green|verde\s*scuro/i,"Verde scuro","#1f5a35"],
+ [/\bjade\b|\bgiada\b/i,"Giada","#3fa17a"],[/\bgreen\b|\bverde\b/i,"Verde","#2e7d32"],
+ [/wine\s*red|\bburgundy\b|\bbordeaux\b/i,"Bordeaux","#6d1a2a"],[/\bred\b|\brosso\b/i,"Rosso","#c62828"],
+ [/\bmagenta\b|\bfuchsia\b|\bfucsia\b/i,"Fucsia","#c2185b"],[/\bsakura\b|light\s*pink|rosa\s*chiaro/i,"Rosa chiaro","#f4b6c8"],
+ [/\bpink\b|\brosa\b/i,"Rosa","#e57ba7"],[/\bpeach\b|\bpesca\b/i,"Pesca","#f6b38e"],
+ [/\borange\b|\barancio(ne)?\b/i,"Arancione","#ef6c00"],[/\byellow\b|\bgiallo\b/i,"Giallo","#f4c430"],
+ [/\blavender\b|\blilac\b|\blilla\b/i,"Lilla","#b39ddb"],[/\bpurple\b|\bviolet\b|\bviola\b/i,"Viola","#6a3fa0"],
+ [/\bwood\b|\blegno\b/i,"Legno","#a47148"],[/\bcoffee\b|\bchocolate\b|\bbrown\b|\bmarrone\b|\bcioccolato\b/i,"Marrone","#6b4226"],
+ [/\bkhaki\b|\bsand\b|\bsabbia\b/i,"Sabbia","#c3b091"],[/\bbeige\b|\bskin\b|\bcream\b|\bcrema\b/i,"Beige","#e3cfa8"],
+ [/\bcyan\b|\bturquoise\b|\bteal\b|\bturchese\b|\bciano\b/i,"Turchese","#1fa3a8"],
+ [/\btransparent\b|\bclear\b|\btrasparente\b|\btranslucent\b/i,"Trasparente","#dfe7ea"],[/\bnatural\b|\bnaturale\b/i,"Naturale","#ece6d6"]];
+const MATS_RE=[["PLA+",/p[l1i|]a\s*(\+|plus|pro)\b|p[l1i|]a\+/i],["PETG",/\bpet\s*-?\s*g\b/i],["ASA",/\basa\b/i],["ABS",/\babs\b/i],
+ ["TPU",/\btpu\b|\btpe\b|\bflex\w*/i],["Nylon",/\bnylon\b|\bpa\s?(6|12)\b|\bpa-cf\b/i],["PLA",/\bp[l1i|]a\b/i],["PC",/\bpolycarbonate\b|\bpc\b/i]];
+const MODS=[[/\bsilk\b/i,"silk"],[/\bmatte?\b|\bopaco\b/i,"opaco"],[/\bglitter|sparkle\b/i,"glitter"],[/\bmarble|marmo\b/i,"marmo"],[/\bglow\b/i,"fosforescente"],[/\brainbow|multicolou?r\b/i,"multicolore"],[/\bdual|tri[- ]?colou?r\b/i,"bicolore"]];
 const r5=v=>Math.round(v/5)*5;
-function findColor(t){
-  const lab=t.match(/(?:colou?r[e]?|colore)\s*[:：\-]?\s*([A-Za-zÀ-ù ]{3,30})/i);
-  const pools=lab?[lab[1],t]:[t];
-  for(const pool of pools){let best=null;
-    for(const [re,name,hex] of COLORS){const m=pool.match(re); if(m&&(best===null||m.index<best.i)) best={i:m.index,name,hex};}
-    if(best) return best;}
-  return null;
+// sceglie la corrispondenza scritta più in grande; a parità, la più lunga e poi la prima
+function pickBig(lines,list){
+  let best=null;
+  for(const ln of lines){ const labeled=/colou?r|colore/i.test(ln.text);
+    list.forEach((it,idx)=>{const m=ln.text.match(it.re); if(!m) return;
+      const sc=ln.h*(labeled?1.5:1); const len=m[0].length;
+      if(!best||sc>best.sc*1.15||(sc>=best.sc/1.15&&(len>best.len||(len===best.len&&idx<best.idx)))) best={sc,len,idx,it};});}
+  return best&&best.it;
 }
-function parseLabel(raw){
-  const t=raw.replace(/[|]/g,"I").replace(/℃/g,"°C"); const L=t.toLowerCase(); const o={};
-  if(/pla\s*(\+|plus|pro)/i.test(t)) o.material="PLA+";
-  else if(/\bpet\s*-?\s*g\b/i.test(t)) o.material="PETG";
-  else if(/\basa\b/i.test(t)) o.material="ASA";
-  else if(/\babs\b/i.test(t)) o.material="ABS";
-  else if(/\btpu\b|\btpe\b|\bflex/i.test(t)) o.material="TPU";
-  else if(/\bnylon\b|\bpa\s?(6|12)\b|\bpa-cf\b/i.test(t)) o.material="Nylon";
-  else if(/\bpla\b/i.test(t)) o.material="PLA";
-  else if(/\bpolycarbonate\b|\bpc\b/i.test(t)) o.material="PC";
+function parseLabel(raw,lines){
+  const t=raw.replace(/℃/g,"°C"); const L=t.toLowerCase(); const o={};
+  const LN=(lines&&lines.length?lines:t.split(/\n/).map(x=>({text:x,h:1}))).filter(l=>l.text&&l.text.trim());
+  const mat=pickBig(LN,MATS_RE.map(([name,re])=>({name,re}))); if(mat) o.material=mat.name; else if(/\bsilk\b/i.test(t)) o.material="PLA";
   const cands=[]; const re=/(\d+(?:[.,]\d+)?)\s*(kg|g)\b/gi; let m;
   while((m=re.exec(t))){let v=parseFloat(m[1].replace(",","."));if(m[2].toLowerCase()==="kg")v*=1000;if(v>=200&&v<=5000)cands.push({v,i:m.index});}
   if(cands.length){const ni=L.search(/net|netto|n\.\s?w|peso/); if(ni>=0) cands.sort((a,b)=>Math.abs(a.i-ni)-Math.abs(b.i-ni)); o.net=Math.round(cands[0].v);}
@@ -281,7 +289,7 @@ function parseLabel(raw){
   if(noz===null){const z=t.match(/(?:nozzle|extru\w*|print\w*|ugello)[^0-9]{0,20}(\d{3})/i); if(z&&+z[1]>=160&&+z[1]<=330) noz=+z[1];}
   if(noz||bed){const def=DEF_T[o.material||"PLA"]; o.temps=[noz||def[0],bed||def[1]];}
   for(const b of BRANDS){if(new RegExp("(^|[^a-z0-9])"+b.replace(/[.+]/g,"\\$&")+"($|[^a-z0-9])","i").test(t)){o.brand=b;break;}}
-  const c=findColor(t); if(c){o.color=c.hex; const mod=MODS.find(([re])=>re.test(t)); o.name=c.name+(mod?" "+mod[1]:"");}
+  const col=pickBig(LN,COLORS.map(([re,name,hex])=>({re,name,hex}))); const c=col; if(c){o.color=c.hex; const mod=MODS.find(([re])=>re.test(t)); o.name=c.name+(mod?" "+mod[1]:"");}
   o._found=!!(o.material||o.net&&o.net!==1000||o.brand||o.name||o.temps);
   return o;
 }
@@ -324,8 +332,10 @@ async function scanLabel(file){
     let best=null, raw="";
     for(const rot of [0,90,270]){
       msg(rot?"Provo a ruotare la foto…":"Leggo il testo…"); bar(0);
-      const {data}=await ocrWorker.recognize(prep(im,rot)); if(ocrCancel) return;
-      const o=parseLabel(data.text||""); o._raw=(data.text||"").trim();
+      const {data}=await ocrWorker.recognize(prep(im,rot),{},{text:true,blocks:true}); if(ocrCancel) return;
+      const rawLines=(data.lines&&data.lines.length?data.lines:(data.blocks||[]).flatMap(b=>(b.paragraphs||[]).flatMap(p=>p.lines||[])));
+      const lines=rawLines.map(l=>({text:l.text||"",h:l.bbox?Math.max(1,l.bbox.y1-l.bbox.y0):1}));
+      const o=parseLabel(data.text||"",lines); o._raw=(data.text||"").trim();
       const score=["material","brand","name","temps"].filter(k=>o[k]).length+(o.net&&o.net!==1000?1:0)+(o.diameter?1:0);
       if(!best||score>best.score){best={o,score};}
       if(score>=3) break;
